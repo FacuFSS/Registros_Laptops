@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro de Laptops</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Sistema de Registro de Laptops</h1>
+        </header>
+
+        <main>
+            <!-- Formulario de Registro de Laptops -->
+            <section class="form-section">
+                <h2>Registrar Nueva Laptop</h2>
+                <form id="laptopForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="laptopMarca">Marca:</label>
+                            <input type="text" id="laptopMarca" name="marca" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="laptopModelo">Modelo:</label>
+                            <input type="text" id="laptopModelo" name="modelo" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="laptopNumeroSerie">Número de Serie:</label>
+                            <input type="text" id="laptopNumeroSerie" name="numero_serie" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="laptopProcesador">Procesador:</label>
+                            <input type="text" id="laptopProcesador" name="procesador" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="laptopRam">Memoria RAM (GB):</label>
+                            <input type="number" id="laptopRam" name="memoria_ram" min="1" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="laptopAlmacenamiento">Almacenamiento (GB):</label>
+                            <input type="number" id="laptopAlmacenamiento" name="almacenamiento" min="1" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="laptopTipoAlmacenamiento">Tipo Almacenamiento:</label>
+                            <select id="laptopTipoAlmacenamiento" name="tipo_almacenamiento" required>
+                                <option value="SSD">SSD</option>
+                                <option value="HDD">HDD</option>
+                                <option value="eMMC">eMMC</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="laptopPantalla">Pantalla (pulgadas):</label>
+                            <input type="number" id="laptopPantalla" name="pantalla_pulgadas" min="0.1" step="0.1" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="laptopTarjetaGrafica">Tarjeta Gráfica:</label>
+                            <input type="text" id="laptopTarjetaGrafica" name="tarjeta_grafica">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="laptopSO">Sistema Operativo:</label>
+                            <input type="text" id="laptopSO" name="sistema_operativo" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="laptopPrecio">Precio Compra:</label>
+                            <input type="number" id="laptopPrecio" name="precio_compra" min="0" step="0.01" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="laptopFechaCompra">Fecha de Compra:</label>
+                            <input type="date" id="laptopFechaCompra" name="fecha_compra" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="laptopProveedor">Proveedor:</label>
+                            <input type="text" id="laptopProveedor" name="proveedor">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="laptopEstado">Estado:</label>
+                            <select id="laptopEstado" name="estado" required>
+                                <option value="Activo">Activo</option>
+                                <option value="Inactivo">Inactivo</option>
+                                <option value="Dañado">Dañado</option>
+                                <option value="Reparación">Reparación</option>
+                                <option value="Vendido">Vendido</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group full-width">
+                            <label for="laptopNotas">Notas:</label>
+                            <textarea id="laptopNotas" name="notas" rows="3"></textarea>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">Registrar Laptop</button>
+                    <button type="reset" class="btn btn-secondary">Limpiar Formulario</button>
+                </form>
+            </section>
+
+            <!-- Tabla de Laptops -->
+            <section class="table-section">
+                <h2>Lista de Laptops Registradas</h2>
+                <div class="table-controls">
+                    <button id="refreshLaptopsTable" class="btn btn-info">Actualizar Tabla</button>
+                    <input type="text" id="searchLaptopsInput" placeholder="Buscar laptops...">
+                </div>
+                
+                <div class="table-container">
+                    <table id="laptopsTable">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Marca</th>
+                                <th>Modelo</th>
+                                <th>Procesador</th>
+                                <th>RAM</th>
+                                <th>Almacenamiento</th>
+                                <th>Precio</th>
+                                <th>Estado</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="laptopsTableBody">
+                            <!-- Los datos se cargarán dinámicamente -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+
+    <!-- Modal de Edición de Laptops -->
+    <div id="editLaptopModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Editar Laptop</h3>
+                <span class="close">&times;</span>
+            </div>
+            
+            <div class="modal-body">
+                <form id="editLaptopForm">
+                    <input type="hidden" id="editLaptopId" name="id">
+                    
+                    <div class="form-group">
+                        <label for="editLaptopMarca">Marca:</label>
+                        <input type="text" id="editLaptopMarca" name="marca" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="editLaptopModelo">Modelo:</label>
+                        <input type="text" id="editLaptopModelo" name="modelo" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="editLaptopNumeroSerie">Número de Serie:</label>
+                        <input type="text" id="editLaptopNumeroSerie" name="numero_serie" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="editLaptopProcesador">Procesador:</label>
+                        <input type="text" id="editLaptopProcesador" name="procesador" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="editLaptopRam">Memoria RAM (GB):</label>
+                        <input type="number" id="editLaptopRam" name="memoria_ram" min="1" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="editLaptopAlmacenamiento">Almacenamiento (GB):</label>
+                        <input type="number" id="editLaptopAlmacenamiento" name="almacenamiento" min="1" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="editLaptopTipoAlmacenamiento">Tipo Almacenamiento:</label>
+                        <select id="editLaptopTipoAlmacenamiento" name="tipo_almacenamiento" required>
+                            <option value="SSD">SSD</option>
+                            <option value="HDD">HDD</option>
+                            <option value="eMMC">eMMC</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="editLaptopPantalla">Pantalla (pulgadas):</label>
+                        <input type="number" id="editLaptopPantalla" name="pantalla_pulgadas" min="0.1" step="0.1" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="editLaptopSO">Sistema Operativo:</label>
+                        <input type="text" id="editLaptopSO" name="sistema_operativo" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="editLaptopPrecio">Precio Compra:</label>
+                        <input type="number" id="editLaptopPrecio" name="precio_compra" min="0" step="0.01" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="editLaptopFechaCompra">Fecha de Compra:</label>
+                        <input type="date" id="editLaptopFechaCompra" name="fecha_compra" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="editLaptopTarjetaGrafica">Tarjeta Gráfica:</label>
+                        <input type="text" id="editLaptopTarjetaGrafica" name="tarjeta_grafica">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="editLaptopProveedor">Proveedor:</label>
+                        <input type="text" id="editLaptopProveedor" name="proveedor">
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label for="editLaptopNotas">Notas:</label>
+                        <textarea id="editLaptopNotas" name="notas" rows="3"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="editLaptopEstado">Estado:</label>
+                        <select id="editLaptopEstado" name="estado" required>
+                            <option value="Activo">Activo</option>
+                            <option value="Inactivo">Inactivo</option>
+                            <option value="Dañado">Dañado</option>
+                            <option value="Reparación">Reparación</option>
+                            <option value="Vendido">Vendido</option>
+                        </select>
+                    </div>
+
+                    <div class="modal-buttons">
+                        <button type="submit" class="btn btn-success">Guardar Cambios</button>
+                        <button type="button" class="btn btn-secondary" id="cancelEditLaptop">Cancelar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Confirmación para Eliminar Laptop -->
+    <div id="deleteLaptopModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Confirmar Eliminación</h3>
+                <span class="close">&times;</span>
+            </div>
+            
+            <div class="modal-body">
+                <p>¿Está seguro de que desea eliminar esta laptop?</p>
+                <p><strong id="deleteLaptopName"></strong></p>
+                
+                <div class="modal-buttons">
+                    <button type="button" class="btn btn-danger" id="confirmDeleteLaptop">Eliminar</button>
+                    <button type="button" class="btn btn-secondary" id="cancelDeleteLaptop">Cancelar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mensajes de Notificación -->
+    <div id="notification" class="notification"></div>
+
+    <!-- Scripts -->
+    <script src="config.js"></script>
+    <script src="supabaseConnection.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
